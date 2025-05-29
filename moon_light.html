@@ -1,77 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moon Secrets</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to bottom, #0d1b2a, #1b263b);
-            color: #e0e1dd;
-            text-align: center;
-            padding: 20px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Moon Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://images.unsplash.com/photo-1532298488760-970ff6decf61') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
 
-        .container {
-            max-width: 600px;
-            margin: auto;
-            border: 2px solid #e0e1dd;
-            border-radius: 10px;
-            padding: 20px;
-            background-color: #415a77;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-        }
+    .quiz-container {
+      background-color: rgba(0, 0, 0, 0.75);
+      max-width: 600px;
+      margin: auto;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 20px #fff3;
+      animation: fadeIn 1s ease-in-out;
+    }
 
-        button {
-            background-color: #778da9;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
 
-        button:hover {
-            background-color: #a8dadc;
-            color: #000;
-        }
+    img {
+      width: 80%;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
 
-        #secretDisplay {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #fefae0;
-        }
-    </style>
+    .option {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      background-color: #4caf50;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      color: white;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .option:hover {
+      background-color: #66bb6a;
+    }
+
+    #feedback {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Moon Secrets</h1>
-        <button id="secretButton">Reveal a Secret</button>
-        <p id="secretDisplay"></p>
-    </div>
-    <script>
-        const moonSecrets = [
-            { "secret": "The Moon always shows us the same face — it’s tidally locked with Earth." },
-            { "secret": "There’s no wind or rain on the Moon, so footprints can last millions of years." },
-            { "secret": "The Moon was likely formed from a collision between Earth and a Mars-sized body." },
-            { "secret": "A full Moon appears once every 29.5 days — a lunar month." },
-            { "secret": "Some believe the Moon influences emotions and dreams — a touch of lunar magic." },
-            { "secret": "There are 'moonquakes' caused by gravitational tugs from Earth." },
-            { "secret": "The Moon is slowly drifting away from Earth — about 1.5 inches per year." },
-            { "secret": "Despite appearing bright, the Moon’s surface is actually quite dark — like asphalt." },
-            { "secret": "The Moon has no atmosphere, so the sky is always black, even during the day." },
-            { "secret": "In some cultures, people say rabbits or faces can be seen on the Moon's surface." }
-        ];
+  <div class="quiz-container">
+    <h1>Moon Quiz 🌕</h1>
+    <img id="quizImage" src="" alt="Moon image" />
+    <p id="question">Loading question...</p>
+    <div id="options"></div>
+    <p id="feedback"></p>
+  </div>
 
-        document.getElementById('secretButton').addEventListener('click', function() {
-            const randomIndex = Math.floor(Math.random() * moonSecrets.length);
-            const randomSecret = moonSecrets[randomIndex].secret;
-            document.getElementById('secretDisplay').innerText = randomSecret;
-        });
-    </script>
+  <script>
+    const quizData = [
+      {
+        question: "Which side of the Moon do we always see from Earth?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/e/e1/FullMoon2010.jpg",
+        options: ["Both sides equally", "The far side", "The near side", "It changes daily"],
+        answer: "The near side"
+      },
+      {
+        question: "Why do Moon footprints last so long?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Apollo_11_bootprint.jpg",
+        options: ["No gravity", "No atmosphere", "Too hot to erase them", "Aliens preserve them"],
+        answer: "No atmosphere"
+      },
+      {
+        question: "What causes a lunar eclipse?",
+        image: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Lunar_eclipse_March_2007.jpg",
+        options: [
+          "Sun between Earth and Moon",
+          "Moon blocking the Sun",
+          "Earth between Sun and Moon",
+          "Mars casting a shadow"
+        ],
+        answer: "Earth between Sun and Moon"
+      }
+    ];
+
+    let current = 0;
+
+    function loadQuestion() {
+      const q = quizData[current];
+      document.getElementById("question").textContent = q.question;
+      document.getElementById("quizImage").src = q.image;
+
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+
+      q.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.className = "option";
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(option);
+        optionsDiv.appendChild(btn);
+      });
+
+      document.getElementById("feedback").textContent = "";
+    }
+
+    function checkAnswer(selected) {
+      const isCorrect = selected === quizData[current].answer;
+      document.getElementById("feedback").textContent = isCorrect
+        ? "✅ Correct!"
+        : `❌ Oops! The correct answer was: ${quizData[current].answer}`;
+
+      setTimeout(() => {
+        current++;
+        if (current < quizData.length) {
+          loadQuestion();
+        } else {
+          document.querySelector(".quiz-container").innerHTML = "<h2>🌟 Quiz Complete!</h2><p>Thanks for playing!</p>";
+        }
+      }, 2000);
+    }
+
+    // Load first question
+    loadQuestion();
+  </script>
 </body>
 </html>
+
 
